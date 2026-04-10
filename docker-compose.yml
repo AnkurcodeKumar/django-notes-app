@@ -5,6 +5,18 @@ services:
     ports:
       - "8000:8000"
     restart: always
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: notes
+    ports:
+      - "3306:3306"
   
 
   
