@@ -7,6 +7,12 @@ services:
     restart: always
     depends_on:
       - db
+    environment:
+      DB_NAME: notes
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: db        
+      DB_PORT: 3306
 
   db:
     image: mysql:8
@@ -15,8 +21,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: notes
-    ports:
-      - "3306:3306"
-  
+
+
+
 
   
