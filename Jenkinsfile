@@ -1,29 +1,59 @@
-@Library('Shared')_
-pipeline{
-    agent { label 'dev-server'}
-    
-    stages{
-        stage("Code clone"){
-            steps{
-                sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+library("Shared")
+
+pipeline {
+    agent { label 'vinod' }
+
+    stages {
+
+        stage("Hello") {
+            steps {
+                script {
+                    hello()
+                }
             }
         }
-        stage("Code Build"){
-            steps{
-            dockerbuild("notes-app","latest")
+
+        stage('Clone Code') {
+            steps {
+                script{
+                   clone('https://github.com/AnkurcodeKumar/django-notes-app.git', 'main')
+                }
             }
         }
-        stage("Push to DockerHub"){
-            steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+
+        stage('Build') {
+            steps {
+               script{
+                   docker_build("notes-app","latest","ankur4556")
+               }
             }
         }
-        stage("Deploy"){
-            steps{
-                deploy()
+
+        stage('Push to DockerHub') {
+            steps {
+                echo 'This is pushing the image to DockerHub'
+
+                withCredentials([usernamePassword(
+                    credentialsId: "dockerHubCred",
+                    usernameVariable: "dockerHubUser",
+                    passwordVariable: "dockerHubPass"
+                )]) {
+
+                    sh "echo ${dockerHubPass} | docker login -u ${dockerHubUser} --password-stdin"
+                    sh "docker tag notes-app:latest ${dockerHubUser}/notes-app:latest"
+                    sh "docker push ${dockerHubUser}/notes-app:latest"
+                }
             }
         }
-        
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                sh '''
+                    docker compose down --remove-orphans
+                    docker compose up -d
+                '''
+            }
+        }
     }
 }
