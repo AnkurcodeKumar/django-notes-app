@@ -50,7 +50,7 @@ pipeline {
             steps {
                 echo 'Deploying application...'
                 sh '''
-                    docker compose down --remove-orphans
+                     --remove-orphans
                     docker compose up -d
                 '''
             }
